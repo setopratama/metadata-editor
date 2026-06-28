@@ -1,44 +1,56 @@
-# Metadata Editor & Image Renamer (Python Version)
+# Adobe Stock Metadata & Renaming Tool
 
-Python utility to batch rename image files (JPG, JPEG, PNG) based on descriptions and embed IPTC/XMP/EXIF metadata (Caption and Keywords) using ExifTool.
+Tool sederhana berbasis Python untuk mengubah nama file gambar (`.jpg`, `.jpeg`, `.png`) secara otomatis berdasarkan deskripsi produk dan menuliskan metadata (`Caption`, `Title`, `Description`, `Keywords`) langsung ke dalam file menggunakan **exiftool**.
 
-## Features
+## Fitur Utama
+- **Rename Otomatis**: Mengubah nama file gambar menjadi ramah SEO menggunakan deskripsi dari `deskripsi.txt`.
+- **Penulisan Metadata EXIF/IPTC/XMP**: Menyisipkan deskripsi dan kata kunci dari `keyword.txt` ke dalam properti metadata gambar secara otomatis.
+- **Rerun Aman (Anti-Duplikasi & Overwrite)**: Jika program dijalankan ulang pada folder yang sama:
+  - File yang sudah di-rename **tidak akan diganti namanya lagi**.
+  - **Mencegah duplikasi nama** (tidak membuat file dengan suffix akhiran `-1`, `-2`, dll. kecuali deskripsinya memang sama).
+  - **Mencegah penimpaan file** (*overwrite*) yang sudah ada.
+  - Memperbarui/memverifikasi metadata untuk file yang sudah diproses secara otomatis.
 
-- **Multi-Format Support**: Processes `.jpg`, `.jpeg`, and `.png` images (case-insensitive).
-- **Auto-Rename**: Renames images based on text descriptions from `deskripsi.txt`, sanitizing invalid filesystem characters and limiting path lengths to 240 characters.
-- **Collision Resolution**: Detects naming duplicates and appends sequential markers (`-1`, `-2`, etc.) to prevent overwriting existing files.
-- **ExifTool Integration**: Writes Caption/Abstract, Title, Description, and Keywords to EXIF, IPTC, and XMP metadata fields.
-- **Zero Python Dependencies**: Works using only Python 3 built-in modules (`os`, `sys`, `subprocess`, `tempfile`, etc.).
+---
 
-## Prerequisites
-
+## Prasyarat
+Sebelum menjalankan tool ini, pastikan sistem Anda telah terinstal:
 1. **Python 3.x**
-2. **ExifTool**: Ensure `exiftool` is installed on your system and is accessible via your environment path (`PATH`).
-   - *Windows users*: You can extract the `exiftool.exe` binary and place it in a folder added to your system environment variables, or keep it in the same directory as this script.
+2. **Exiftool**: Tool command-line untuk membaca dan menulis metadata file.
+   - Pastikan perintah `exiftool` bisa dijalankan melalui Command Prompt / PowerShell Anda (sudah didaftarkan ke PATH sistem).
 
-## Setup & File Structure
+---
 
-Place the following files in your working directory:
-- `metadata.py` (the Python script)
-- `deskripsi.txt` (contains image descriptions, one description per line)
-- `keyword.txt` (contains tags/keywords for each image, comma-separated on each line)
-- Your target image files (`.jpg`, `.jpeg`, `.png`)
-
-Example structure:
+## Struktur Folder Kerja
+Pastikan file-file berikut berada dalam satu direktori yang sama:
 ```text
-your-folder/
-├── deskripsi.txt
-├── keyword.txt
-├── metadata.py
-├── image1.png
-└── image2.jpg
+folder-kerja/
+│
+├── metadata.py         # Script utama ini
+├── deskripsi.txt       # Berisi daftar deskripsi gambar (satu deskripsi per baris)
+├── keyword.txt         # Berisi daftar kata kunci gambar (dipisahkan koma, satu baris per gambar)
+│
+├── gambar1.jpg         # File gambar masukan (bisa berupa JPG, JPEG, atau PNG)
+├── gambar2.png
+└── ...
 ```
 
-## How to Run
+*Catatan: Jumlah baris pada `deskripsi.txt` dan `keyword.txt` harus berurutan dan sesuai dengan urutan file gambar yang ingin Anda proses.*
 
-1. Open your terminal/command prompt.
-2. Navigate to your working directory.
-3. Run the script:
+---
+
+## Cara Menjalankan
+
+1. Buka terminal (Command Prompt / PowerShell / Terminal).
+2. Arahkan ke folder kerja Anda.
+3. Jalankan perintah berikut:
    ```bash
    python metadata.py
    ```
+
+---
+
+## Log Eksekusi
+- `[OK] Rename: ...`: File berhasil diganti namanya.
+- `[INFO] Metadata ditulis: ...`: Metadata berhasil disuntikkan ke dalam file gambar.
+- `[INFO] File sudah diproses sebelumnya: ...`: Menandakan file tersebut dilewati proses rename-nya karena sudah diproses pada eksekusi sebelumnya, lalu metadatanya diperbarui secara otomatis.
