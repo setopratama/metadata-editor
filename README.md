@@ -32,12 +32,12 @@ folder-kerja/
 ├── deskripsi.txt       # Berisi daftar deskripsi gambar (satu deskripsi per baris)
 ├── keyword.txt         # Berisi daftar kata kunci gambar (dipisahkan koma, satu baris per gambar)
 │
-├── upscayl_jpg_.../    # Folder input gambar (opsional, script memindai secara rekursif)
-│   ├── gambar1.jpg
-│   └── gambar2.jpg
-│
 └── upload/             # Folder hasil rename & tag metadata (dibuat otomatis)
-    ├── Sad_woman_looking...jpg
+    ├── upscayl_jpg_.../    # Folder input gambar (script memindai secara rekursif)
+    │   ├── gambar1.jpg
+    │   └── gambar2.jpg
+    │
+    ├── Sad_woman_looking...jpg   # File hasil rename
     └── ...
 ```
 

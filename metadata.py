@@ -73,10 +73,10 @@ def main():
     if not os.path.exists(upload_folder):
         os.makedirs(upload_folder)
 
-    # Find matching files recursively in current folder and subfolders
+    # Find matching files recursively in upload folder and its subfolders
     files = []
     # Support jpg, jpeg, png (case-insensitive)
-    for root, dirs, filenames in os.walk(folder):
+    for root, dirs, filenames in os.walk(upload_folder):
         for filename in filenames:
             ext = os.path.splitext(filename)[1].lower()
             if ext in ['.jpg', '.jpeg', '.png']:
