@@ -69,13 +69,18 @@ def write_exif_with_argfile(file_path, caption, keywords):
 def main():
     folder = os.getcwd()
     print("Working folder:", folder)
+    upload_folder = os.path.join(folder, "upload")
+    if not os.path.exists(upload_folder):
+        os.makedirs(upload_folder)
 
-    # Find matching files
+    # Find matching files recursively in current folder and subfolders
     files = []
     # Support jpg, jpeg, png (case-insensitive)
-    patterns = ["*.jpg", "*.jpeg", "*.png", "*.JPG", "*.JPEG", "*.PNG"]
-    for pat in patterns:
-        files.extend(glob.glob(os.path.join(folder, pat)))
+    for root, dirs, filenames in os.walk(folder):
+        for filename in filenames:
+            ext = os.path.splitext(filename)[1].lower()
+            if ext in ['.jpg', '.jpeg', '.png']:
+                files.append(os.path.join(root, filename))
     
     # Remove duplicates and sort
     files = sorted(list(set(files)))
@@ -121,7 +126,17 @@ def main():
         for file_path in files:
             if file_path in processed_files:
                 continue
-            if is_file_matching_desc(file_path, caption, folder):
+            if is_file_matching_desc(file_path, caption, upload_folder):
+                # Jika file berada di luar folder upload, pindahkan ke dalam folder upload
+                if os.path.normpath(os.path.dirname(file_path)) != os.path.normpath(upload_folder):
+                    dst = os.path.join(upload_folder, os.path.basename(file_path))
+                    try:
+                        os.rename(file_path, dst)
+                        print(f"[INFO] Memindahkan file ke folder upload: {os.path.basename(file_path)}")
+                        file_path = dst
+                    except Exception as e:
+                        print(f"[WARN] Gagal memindahkan file ke folder upload: {e}")
+
                 processed_files.add(file_path)
                 used_desc_indices.add(idx)
                 print(f"[INFO] File sudah diproses sebelumnya: {os.path.basename(file_path)} (Indeks deskripsi ke-{idx+1})")
@@ -144,8 +159,8 @@ def main():
     files_to_process = unprocessed_files[:n_process]
     descs_to_use_indices = unused_desc_indices[:n_process]
     
-    # Kumpulkan nama file saat ini di folder untuk menghindari tabrakan penamaan baru
-    current_names_in_folder = set(os.listdir(folder))
+    # Kumpulkan nama file saat ini di folder upload untuk menghindari tabrakan penamaan baru
+    current_names_in_folder = set(os.listdir(upload_folder))
     
     # 4. Proses file yang belum diproses
     for i, src in enumerate(files_to_process):
@@ -156,7 +171,7 @@ def main():
         base = sanitize_filename(caption)
         if not base:
             base = sanitize_filename(os.path.splitext(os.path.basename(src))[0])
-        base = trim_to_max_length(base, ext, folder)
+        base = trim_to_max_length(base, ext, upload_folder)
         
         name = base + ext
         j = 1
@@ -165,13 +180,13 @@ def main():
             j += 1
             
         current_names_in_folder.add(name)
-        dst = os.path.join(folder, name)
+        dst = os.path.join(upload_folder, name)
         
         try:
             os.rename(src, dst)
-            print(f"[OK] Rename: {os.path.basename(src)} -> {name}")
+            print(f"[OK] Rename: {os.path.basename(src)} -> upload/{name}")
             write_exif_with_argfile(dst, caption, keywords)
-            print(f"[INFO] Metadata ditulis: {name}")
+            print(f"[INFO] Metadata ditulis: upload/{name}")
         except Exception as e:
             print(f"[FAIL] Gagal memproses {os.path.basename(src)}: {e}")
 
